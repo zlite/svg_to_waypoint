@@ -3,16 +3,33 @@ from svgpathtools import Path, Line, QuadraticBezier, CubicBezier, Arc, svg2path
 import re, csv
 
 paths, attributes = svg2paths('blueprint.svg')
-path = attributes[1]  # get the attributes (data) from the path object
-data = path['d'] # do a dictionary lookup for the data following the 'd'
-data = str(data) # convert it to a string
-print('Data = ', data)
-x = re.findall('\d*\.\d*(?=L)', data)  # regex finds data before the L (x's)
-print('Xs: ', x)
-y = re.findall('(?<=L)\d*\.?\d*', data)  # regex finds data after the L (y's)
-print('Ys: ', y)
-print('Sample waypoint: ',x[3],y[3])
-with open('waypoint.csv','w') as data:   # write the waypoints to a file
-    data.write(str(x))
-    data.write(str(y))
+
+d = attributes[1]['d']  # d-string from first path in SVG
+
+# Now for some regular expressions magic
+import re
+split_by_letters = re.findall('[A-Z|a-z][^A-Z|a-z]*', d)
+data = []
+waypoint = []
+for x in split_by_letters:
+    nums = x[1:].replace(',',' ').split()  # list of numbers after letter
+    for k in range(len(nums) // 2):
+        data.append([x[0]] +  [nums[k]] + [nums[k+1]])
+        if x[0] == 'M':
+            print(x[0])
+            print (nums[k],nums[k+1])
+            waypoint.append('M')
+            waypoint.append(nums[k])
+            waypoint.append(nums[k+1])
+            waypoint.append('L')
+            print ('L')
+        if x[0] == 'L':
+            print (nums[k],nums[k+1])
+            waypoint.append(nums[k])
+            waypoint.append(nums[k+1])
+
+
+file = open('waypoint.csv','w')   # write the waypoints to a file
+file.write(str(waypoint))
+file.close()
 print("Done")
