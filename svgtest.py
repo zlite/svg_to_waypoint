@@ -27,8 +27,6 @@ for x in split_by_letters:
             print (nums[k],nums[k+1])
             waypoint.append(nums[k])
             waypoint.append(nums[k+1])
-
-
 file = open('waypoint.csv','w')   # write the waypoints to a file
 file.write(str(waypoint))
 file.close()
