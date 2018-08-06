@@ -1,13 +1,13 @@
 # Read SVG into a list of path objects and list of dictionaries of attributes
 from svgpathtools import Path, Line, QuadraticBezier, CubicBezier, Arc, svg2paths, wsvg
-import re, csv
+import re, csv, struct
 
 paths, attributes = svg2paths('blueprint.svg')
 
 d = attributes[1]['d']  # d-string from first path in SVG
 
 # Now for some regular expressions magic
-import re
+print('Start')
 split_by_letters = re.findall('[A-Z|a-z][^A-Z|a-z]*', d)
 data = []
 waypoint = []
@@ -27,7 +27,16 @@ for x in split_by_letters:
             print (nums[k],nums[k+1])
             waypoint.append(nums[k])
             waypoint.append(nums[k+1])
-file = open('waypoint.csv','w')   # write the waypoints to a file
-file.write(str(waypoint))
-file.close()
-print("Done")
+myFile = open('waypoint.csv', 'w',newline='')
+with myFile:
+    writer = csv.writer(myFile)
+    writer.writerows(nums)
+print("Done with writing")
+# now let's read that file
+print('Reading....')
+with open('waypoint.csv', newline='') as csvfile:
+    file = csv.reader(csvfile, delimiter=' ', quotechar='|')
+    for row in file:
+        print(', '.join(row))
+print(row)         
+print('Done')
